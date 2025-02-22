@@ -7,43 +7,27 @@ import softest
 import pytest
 from pages.flipkart_home_page import FlipkartHomePage
 
+@pytest.mark.usefixtures("setup_login")
 class TestFlipkartMobiles(softest.TestCase):
+
+    @pytest.fixture(autouse=True)
+    def setup_class(self):
+        self.flipkart_home_page = FlipkartHomePage(self.driver)
 
     def test_search_i_phones_page_nav(self):
 
         self.soft_assert(self.assertEqual,self.driver.title,"Online Shopping Site for Mobiles, Electronics, Furniture, Grocery, Lifestyle, Books & More. Best Offers!")
 
         wait = WebDriverWait(self.driver, 10)
-
         actions = ActionChains(self.driver)
-        # actions.move_to_element(self.driver.find_element(By.CSS_SELECTOR,"div[aria-label='Electronics']"))
-        # actions.perform()
 
-        fp_h_p = FlipkartHomePage(self.driver)
-        fp_h_p.hover_on_electrnoics()
-        # self.soft_assert(self.assertNotEqual,wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR,"._1UgUYI._2eN8ye"))),False)
-        self.soft_assert(self.assertNotEqual,fp_h_p.wait_and_return_electronics_container_locator, False)
+        self.flipkart_home_page.hover_on_electronics()
+        self.soft_assert(self.assertNotEqual, self.flipkart_home_page.wait_and_return_electronics_container, False)
+        mobiles_product_page = self.flipkart_home_page.open_mobiles_product_page()
+        self.soft_assert(self.assertNotEqual,mobiles_product_page.wait_for_title_to_be_visible_and_return_loc(),False)
 
-        # driver.save_screenshot("..\\Screenshots\\Home_Page_Electronics.png")
-        actions.move_to_element(self.driver.find_element(By.CSS_SELECTOR,"a[aria-label='Mobiles']"))
-        actions.perform()
-        # driver.save_screenshot("..\\Screenshots\\Home_Page_Mobiles.png")
-        actions.click()
-        actions.perform()
-        # driver.save_screenshot("..\\Screenshots\\Mobiles_Page.png")
-
-        self.soft_assert(self.assertNotEqual,wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR,"._0FYq1K"))),False)
-
-        self.driver.find_element(By.CSS_SELECTOR,"div[title='Apple']").click()
-        filter_apple = wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR,".nvQqOr .YcSYyC:first-child")))
-        # print(filter_apple.text)
-        # assert "Aple" in filter_apple.text
-        self.soft_assert(self.assertIn,"Apple",filter_apple.text)
-
-        # driver.save_screenshot("..\\Screenshots\\Filter_ApplePhones.png")
-
-        # filter_apple_phones_page1 = driver.find_element(By.XPATH,"//a[normalize-space()='1']")
-        # print(filter_apple_phones_page1.get_attribute("class"))
+        filter_applied_apple = mobiles_product_page.select_apple_filter_checkbox()
+        self.soft_assert(self.assertIn,"Apple",filter_applied_apple.text)
 
         filter_apple_phones_page5 = self.driver.find_element(By.XPATH,"//a[normalize-space()='5']")
         filter_apple_phones_page5.click()
